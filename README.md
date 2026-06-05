@@ -31,12 +31,12 @@
 1. **設定 → デバイスとサービス → 統合を追加** を開く
 2. **Stock Manager** を検索
 3. 接続情報を入力
-   - **アドオンのURL**: 既定 `http://3a30c8ec-stock-manager:8099`（アドオンの内部ホスト名。HA内部ネットワークからのみ到達し、LANには公開されません）
+   - **アドオンのURL**: 既定 `http://3a30c8ec-stock-manager:8099`（アドオンの内部ホスト名。HA 内部ネットワークからのみ到達し、LAN には公開されません）
    - **更新間隔（秒）**: デフォルト `300`（最小 `30`）
 
 セットアップ後も、統合の **オプション** から URL・更新間隔を変更できます。接続確認に失敗した場合は「接続できませんでした。URLを確認してください。」と表示されます。
 
-> **アドオンは Ingress 専用構成です。** Stock Manager アドオンは LAN にポートを公開していない（Ingress のみ）ため、統合はアドオンの内部ホスト名 `http://3a30c8ec-stock-manager:8099` で接続します（`localhost:8099` では接続できません）。内部ホスト名はアドオンの slug `3a30c8ec_stock_manager` の `_` を `-` に置き換えたものです。環境により異なる場合はオプションのURLを合わせて変更してください。既存の統合は、オプションでURLをこの値に更新してください。
+> **アドオンは Ingress 専用構成です。** Stock Manager アドオンは LAN にポートを公開していない（Ingress のみ）ため、統合はアドオンの内部ホスト名 `http://3a30c8ec-stock-manager:8099` で接続します（`localhost:8099` では接続できません）。内部ホスト名はアドオンの slug `3a30c8ec_stock_manager` の `_` を `-` に置き換えたものです。環境により異なる場合はオプションの URL を合わせて変更してください。
 
 ## エンティティ一覧
 
@@ -64,7 +64,7 @@
 
 ### `select.products`
 
-全品目の一覧を表す select エンティティです。`options` は各品目の `product_id`、選択した値が状態（state）になります。属性 `products` に、各品目の概要（`id` / `name` / `quantity` / `category` / `piece_count`）が含まれます。
+全品目の一覧を表す select エンティティです。`options` は各品目の `product_id` の一覧で、選択した値が状態（state）になります。属性 `products` に、各品目の概要（`id` / `name` / `quantity` / `category` / `piece_count`）が含まれます。サービス呼び出し時の `product_id` 選択に活用できます。
 
 ## サービス
 
@@ -121,4 +121,4 @@ automation:
 
 ## ライセンス
 
-提供元リポジトリ [hgn32/ha-addons](https://github.com/hgn32/ha-addons) に準じます。
+[MIT License](LICENSE)
