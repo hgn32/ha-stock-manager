@@ -3,7 +3,7 @@
   "name": "Stock Manager",
   "version": "1.0.0",
   "config_flow": true,
-  "documentation": "https://github.com/hgn32/ha-addons",
+  "documentation": "https://github.com/hgn32/ha-stock-manager",
   "requirements": [],
   "dependencies": [],
   "codeowners": [],
