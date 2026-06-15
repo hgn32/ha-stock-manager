@@ -13,7 +13,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from .const import CONF_SCAN_INTERVAL, CONF_URL, DEFAULT_SCAN_INTERVAL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
-PLATFORMS = ["sensor", "select"]
+PLATFORMS = ["sensor", "select", "button"]
 
 SERVICE_USE = "use"
 SERVICE_ADD = "add"
