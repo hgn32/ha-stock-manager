@@ -61,6 +61,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 class StockManagerCoordinator(DataUpdateCoordinator):
+    current_product_id: str | None = None
+
     def __init__(self, hass: HomeAssistant, url: str, interval: int) -> None:
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=timedelta(seconds=interval))
         self.url = url

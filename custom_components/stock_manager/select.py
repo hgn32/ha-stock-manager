@@ -56,4 +56,8 @@ class ProductsSelect(CoordinatorEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> None:
         self._attr_current_option = option
+        self.coordinator.current_product_id = next(
+            (p["id"] for p in self.coordinator.data["products"] if p["name"] == option),
+            None,
+        )
         self.async_write_ha_state()
