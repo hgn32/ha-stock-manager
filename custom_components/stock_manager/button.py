@@ -26,6 +26,7 @@ class _StockButton(CoordinatorEntity, ButtonEntity):
     def __init__(self, coordinator: StockManagerCoordinator, entry_id: str) -> None:
         super().__init__(coordinator)
         self._attr_unique_id = f"stock_manager_{self._action}_{entry_id}"
+        self.entity_id = f"button.stock_manager_{self._action}"
 
     async def async_press(self) -> None:
         pid = self.coordinator.current_product_id

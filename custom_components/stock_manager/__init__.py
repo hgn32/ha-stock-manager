@@ -15,10 +15,8 @@ from .const import CONF_SCAN_INTERVAL, CONF_URL, DEFAULT_SCAN_INTERVAL, DOMAIN
 _LOGGER = logging.getLogger(__name__)
 PLATFORMS = ["sensor", "select", "button"]
 
-SERVICE_UPDATE = "update"
 SERVICE_SCHEMA = vol.Schema({
     vol.Required("product_id"): cv.string,
-    vol.Required("action"): vol.In(["add", "use"]),
     vol.Optional("quantity", default=1): vol.All(int, vol.Range(min=1)),
 })
 
@@ -33,10 +31,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
-    async def _handle_update(call: ServiceCall) -> None:
-        await coordinator.async_post(call.data["action"], call.data["product_id"], call.data["quantity"])
+    async def _handle_add(call: ServiceCall) -> None:
+        await coordinator.async_post("add", call.data["product_id"], call.data["quantity"])
 
-    hass.services.async_register(DOMAIN, SERVICE_UPDATE, _handle_update, schema=SERVICE_SCHEMA)
+    async def _handle_use(call: ServiceCall) -> None:
+        await coordinator.async_post("use", call.data["product_id"], call.data["quantity"])
+
+    hass.services.async_register(DOMAIN, "add", _handle_add, schema=SERVICE_SCHEMA)
+    hass.services.async_register(DOMAIN, "use", _handle_use, schema=SERVICE_SCHEMA)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
@@ -48,7 +50,8 @@ async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> Non
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    hass.services.async_remove(DOMAIN, SERVICE_UPDATE)
+    hass.services.async_remove(DOMAIN, "add")
+    hass.services.async_remove(DOMAIN, "use")
     ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if ok:
         hass.data[DOMAIN].pop(entry.entry_id, None)
