@@ -30,13 +30,18 @@ class ProductsSelect(CoordinatorEntity, SelectEntity):
 
     @property
     def options(self) -> list[str]:
-        return [p["id"] for p in self.coordinator.data["products"]]
+        return [p["name"] for p in self.coordinator.data["products"]]
 
     @property
     def extra_state_attributes(self) -> dict:
         products = self.coordinator.data["products"]
         cat_map = self.coordinator.data["cat_map"]
+        selected_id = next(
+            (p["id"] for p in products if p["name"] == self._attr_current_option),
+            None,
+        )
         return {
+            "selected_product_id": selected_id,
             "products": [
                 {
                     "id": p["id"],
@@ -46,7 +51,7 @@ class ProductsSelect(CoordinatorEntity, SelectEntity):
                     "piece_count": p.get("piece_count", 1),
                 }
                 for p in products
-            ]
+            ],
         }
 
     async def async_select_option(self, option: str) -> None:
