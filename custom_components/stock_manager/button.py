@@ -6,7 +6,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from . import StockManagerCoordinator, _API_ACTION
+from . import StockManagerCoordinator
 from .const import DOMAIN
 
 
@@ -15,13 +15,13 @@ async def async_setup_entry(
 ) -> None:
     coordinator: StockManagerCoordinator = hass.data[DOMAIN][entry.entry_id]
     async_add_entities([
-        StockRemoveButton(coordinator, entry.entry_id),
+        StockUseButton(coordinator, entry.entry_id),
         StockAddButton(coordinator, entry.entry_id),
     ])
 
 
 class _StockButton(CoordinatorEntity, ButtonEntity):
-    _action: str  # "add" or "remove"
+    _action: str  # "add" or "use"
 
     def __init__(self, coordinator: StockManagerCoordinator, entry_id: str) -> None:
         super().__init__(coordinator)
@@ -31,11 +31,11 @@ class _StockButton(CoordinatorEntity, ButtonEntity):
         pid = self.coordinator.current_product_id
         if pid is None:
             return
-        await self.coordinator.async_post(_API_ACTION[self._action], pid, 1)
+        await self.coordinator.async_post(self._action, pid, 1)
 
 
-class StockRemoveButton(_StockButton):
-    _action = "remove"
+class StockUseButton(_StockButton):
+    _action = "use"
     _attr_name = "在庫消費"
     _attr_icon = "mdi:minus-circle-outline"
 

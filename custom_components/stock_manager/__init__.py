@@ -17,12 +17,10 @@ PLATFORMS = ["sensor", "select", "button"]
 
 SERVICE_UPDATE = "update"
 SERVICE_SCHEMA = vol.Schema({
-    vol.Required("item"): cv.string,
-    vol.Required("action"): vol.In(["add", "remove"]),
-    vol.Optional("number", default=1): vol.All(int, vol.Range(min=1)),
+    vol.Required("product_id"): cv.string,
+    vol.Required("action"): vol.In(["add", "use"]),
+    vol.Optional("quantity", default=1): vol.All(int, vol.Range(min=1)),
 })
-
-_API_ACTION = {"add": "add", "remove": "use"}
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -36,8 +34,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
     async def _handle_update(call: ServiceCall) -> None:
-        api_action = _API_ACTION[call.data["action"]]
-        await coordinator.async_post(api_action, call.data["item"], call.data["number"])
+        await coordinator.async_post(call.data["action"], call.data["product_id"], call.data["quantity"])
 
     hass.services.async_register(DOMAIN, SERVICE_UPDATE, _handle_update, schema=SERVICE_SCHEMA)
 

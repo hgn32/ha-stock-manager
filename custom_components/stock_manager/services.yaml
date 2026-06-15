@@ -2,7 +2,7 @@ update:
   name: 在庫更新
   description: 指定した品目の在庫を追加または消費する
   fields:
-    item:
+    product_id:
       name: 品目ID
       description: 商品のUUID
       required: true
@@ -10,14 +10,14 @@ update:
         text:
     action:
       name: 操作
-      description: add（追加）または remove（消費）
+      description: add（追加）または use（消費）
       required: true
       selector:
         select:
           options:
             - add
-            - remove
-    number:
+            - use
+    quantity:
       name: 数量
       description: 変更する数量（デフォルト1）
       required: false
