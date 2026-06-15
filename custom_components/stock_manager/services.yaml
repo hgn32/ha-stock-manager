@@ -1,16 +1,16 @@
-use:
-  name: 在庫消費
-  description: 指定した品目の在庫を消費する
+add:
+  name: 在庫追加
+  description: 指定した品目の在庫を追加する
   fields:
     product_id:
       name: 品目ID
-      description: sensor.product_<product_id> の product_id 属性
+      description: 商品のUUID
       required: true
       selector:
         text:
     quantity:
       name: 数量
-      description: 消費する数量（デフォルト1）
+      description: 追加する数量（デフォルト1）
       required: false
       default: 1
       selector:
@@ -19,19 +19,19 @@ use:
           max: 9999
           mode: box
 
-add:
-  name: 在庫追加
-  description: 指定した品目の在庫を追加する
+use:
+  name: 在庫消費
+  description: 指定した品目の在庫を消費する
   fields:
     product_id:
       name: 品目ID
-      description: sensor.product_<product_id> の product_id 属性
+      description: 商品のUUID
       required: true
       selector:
         text:
     quantity:
       name: 数量
-      description: 追加する数量（デフォルト1）
+      description: 消費する数量（デフォルト1）
       required: false
       default: 1
       selector:

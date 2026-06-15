@@ -13,10 +13,8 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from .const import CONF_SCAN_INTERVAL, CONF_URL, DEFAULT_SCAN_INTERVAL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
-PLATFORMS = ["sensor", "select"]
+PLATFORMS = ["sensor", "select", "button"]
 
-SERVICE_USE = "use"
-SERVICE_ADD = "add"
 SERVICE_SCHEMA = vol.Schema({
     vol.Required("product_id"): cv.string,
     vol.Optional("quantity", default=1): vol.All(int, vol.Range(min=1)),
@@ -33,14 +31,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
-    async def _handle_use(call: ServiceCall) -> None:
-        await coordinator.async_post("use", call.data["product_id"], call.data.get("quantity", 1))
-
     async def _handle_add(call: ServiceCall) -> None:
-        await coordinator.async_post("add", call.data["product_id"], call.data.get("quantity", 1))
+        await coordinator.async_post("add", call.data["product_id"], call.data["quantity"])
 
-    hass.services.async_register(DOMAIN, SERVICE_USE, _handle_use, schema=SERVICE_SCHEMA)
-    hass.services.async_register(DOMAIN, SERVICE_ADD, _handle_add, schema=SERVICE_SCHEMA)
+    async def _handle_use(call: ServiceCall) -> None:
+        await coordinator.async_post("use", call.data["product_id"], call.data["quantity"])
+
+    hass.services.async_register(DOMAIN, "add", _handle_add, schema=SERVICE_SCHEMA)
+    hass.services.async_register(DOMAIN, "use", _handle_use, schema=SERVICE_SCHEMA)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
@@ -52,8 +50,8 @@ async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> Non
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    hass.services.async_remove(DOMAIN, SERVICE_USE)
-    hass.services.async_remove(DOMAIN, SERVICE_ADD)
+    hass.services.async_remove(DOMAIN, "add")
+    hass.services.async_remove(DOMAIN, "use")
     ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if ok:
         hass.data[DOMAIN].pop(entry.entry_id, None)
@@ -61,6 +59,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 class StockManagerCoordinator(DataUpdateCoordinator):
+    current_product_id: str | None = None
+
     def __init__(self, hass: HomeAssistant, url: str, interval: int) -> None:
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=timedelta(seconds=interval))
         self.url = url
