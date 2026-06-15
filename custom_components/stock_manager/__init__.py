@@ -15,12 +15,14 @@ from .const import CONF_SCAN_INTERVAL, CONF_URL, DEFAULT_SCAN_INTERVAL, DOMAIN
 _LOGGER = logging.getLogger(__name__)
 PLATFORMS = ["sensor", "select", "button"]
 
-SERVICE_USE = "use"
-SERVICE_ADD = "add"
+SERVICE_UPDATE = "update"
 SERVICE_SCHEMA = vol.Schema({
-    vol.Required("product_id"): cv.string,
-    vol.Optional("quantity", default=1): vol.All(int, vol.Range(min=1)),
+    vol.Required("item"): cv.string,
+    vol.Required("action"): vol.In(["add", "remove"]),
+    vol.Optional("number", default=1): vol.All(int, vol.Range(min=1)),
 })
+
+_API_ACTION = {"add": "add", "remove": "use"}
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -33,14 +35,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
-    async def _handle_use(call: ServiceCall) -> None:
-        await coordinator.async_post("use", call.data["product_id"], call.data.get("quantity", 1))
+    async def _handle_update(call: ServiceCall) -> None:
+        api_action = _API_ACTION[call.data["action"]]
+        await coordinator.async_post(api_action, call.data["item"], call.data["number"])
 
-    async def _handle_add(call: ServiceCall) -> None:
-        await coordinator.async_post("add", call.data["product_id"], call.data.get("quantity", 1))
-
-    hass.services.async_register(DOMAIN, SERVICE_USE, _handle_use, schema=SERVICE_SCHEMA)
-    hass.services.async_register(DOMAIN, SERVICE_ADD, _handle_add, schema=SERVICE_SCHEMA)
+    hass.services.async_register(DOMAIN, SERVICE_UPDATE, _handle_update, schema=SERVICE_SCHEMA)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
@@ -52,8 +51,7 @@ async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> Non
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    hass.services.async_remove(DOMAIN, SERVICE_USE)
-    hass.services.async_remove(DOMAIN, SERVICE_ADD)
+    hass.services.async_remove(DOMAIN, SERVICE_UPDATE)
     ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if ok:
         hass.data[DOMAIN].pop(entry.entry_id, None)

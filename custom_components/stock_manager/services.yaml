@@ -1,37 +1,25 @@
-use:
-  name: 在庫消費
-  description: 指定した品目の在庫を消費する
+update:
+  name: 在庫更新
+  description: 指定した品目の在庫を追加または消費する
   fields:
-    product_id:
+    item:
       name: 品目ID
-      description: sensor.product_<product_id> の product_id 属性
+      description: 商品のUUID
       required: true
       selector:
         text:
-    quantity:
-      name: 数量
-      description: 消費する数量（デフォルト1）
-      required: false
-      default: 1
-      selector:
-        number:
-          min: 1
-          max: 9999
-          mode: box
-
-add:
-  name: 在庫追加
-  description: 指定した品目の在庫を追加する
-  fields:
-    product_id:
-      name: 品目ID
-      description: sensor.product_<product_id> の product_id 属性
+    action:
+      name: 操作
+      description: add（追加）または remove（消費）
       required: true
       selector:
-        text:
-    quantity:
+        select:
+          options:
+            - add
+            - remove
+    number:
       name: 数量
-      description: 追加する数量（デフォルト1）
+      description: 変更する数量（デフォルト1）
       required: false
       default: 1
       selector:
