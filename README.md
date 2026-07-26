@@ -1,5 +1,7 @@
 # Stock Manager（Home Assistant カスタム統合）
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/P1O623UCN0)
+
 [Stock Manager アドオン](https://github.com/hgn32/ha-addons) の在庫データを Home Assistant に取り込むカスタム統合です。品目ごとの在庫数をセンサーとして公開し、在庫の消費・追加をサービスから実行できます。
 
 ## 必要要件
